@@ -1,0 +1,78 @@
+
+.product-discovery-product-list__grid {
+    grid-template-columns: repeat(1, 1fr);
+    gap:20px;
+    grid-auto-rows: 1fr;
+    padding: 0;
+    margin: 0;  
+}
+
+@media (min-width: 600px) {
+    .product-discovery-product-list__grid {
+        grid-template-columns: repeat(2, 1fr); 
+    }
+}
+
+@media (min-width: 900px) {
+    .product-discovery-product-list__grid {
+        grid-template-columns: repeat(3, 1fr); 
+    }
+}
+
+.product-discovery-product-list__grid .dropin-product-item-card {
+    width: 100%;
+    border: none;
+    display: flex;
+    flex-direction: column;
+}
+
+.product-discovery-product-list__grid .dropin-product-item-card:hover {
+    border: none;
+    box-shadow: none;
+    padding: 0;
+}
+
+.product-discovery-product-list__grid .dropin-product-item-card__image img {
+    display: block;
+    aspect-ratio: 1 / 1.20;
+    width: 75%;
+    height: 75%;
+    margin: 0 auto;
+    object-fit: contain;
+}
+
+.dropin-product-item-card__title {
+    color: var(--frescopa-color-text);
+    letter-spacing: 0;
+    display: inline-block;
+    text-decoration: none;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    margin-top: 20px;
+}
+
+.dropin-product-item-card__title > a  {
+    color: var(--frescopa-color-text);
+    font: normal normal 300 32px/42px Baskerville, serif;
+    margin-top: 20px;
+}
+
+
+.dropin-product-item-card__title a.product-description  {
+    color: var(--frescopa-color-text);
+    font: normal normal 300 18px/24px Roboto, sans-serif;
+    max-width: 340px;
+    margin-top: 10px;
+}
+
+.dropin-product-item-card__title > a:hover  {
+    color: var(--color-brand-700);
+}
+
+.dropin-price--small {
+    font: var(--type-headline-2-strong-font);
+    letter-spacing: var(--type-headline-2-strong-letter-spacing);
+    color: var(--frescopa-color-text);
+}
+
+
