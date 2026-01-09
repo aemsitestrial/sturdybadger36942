@@ -1,6 +1,6 @@
 mountpoints:
   /:
-    url: "https://author-p130360-e1272151.adobeaemcloud.com/bin/franklin.delivery/aemsitestrial/aem-boilerplate-frescopa/main"
+    url: "https://author-p153710-e1614654.adobeaemcloud.com/bin/franklin.delivery/aemsitestrial/sturdybadger36942/main"
     type: "markup"
     suffix: ".html"
 folders:
