@@ -65,7 +65,7 @@ npm run lint
 
 See also [Developer Tutorial](https://experienceleague.adobe.com/en/docs/experience-manager-cloud-service/content/edge-delivery/wysiwyg-authoring/edge-dev-getting-started)
 
-1. Create a new repository based on the `aem-boilerplate-xwalk-commerce` template 
+1. Create a new repository based on the `sturdybadger36942-commerce` template 
 2. Install all dependencies using `npm i`.
 3. Add the [AEM Code Sync GitHub App](https://github.com/apps/aem-code-sync) to the repository, so your code changes get synced with EDS.
 5. [todo] create a new site in AEM using the site template XXX
