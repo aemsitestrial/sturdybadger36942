@@ -566,7 +566,7 @@ main[hidden] {
 
 .frescopa-background-yellow {
   background-color: var(--frescopa-color-tertiary);
-  border: 2px solid red;
+  border: 2px solid blue;
 }
 
 .frescopa-background-blue {
