@@ -5352,8 +5352,8 @@
       {
         "component": "reference",
         "valueType": "string",
-        "name": "fileReference",
-        "label": "Background Image",
+        "name": "image",
+        "label": "Image",
         "multi": false
       },
       {

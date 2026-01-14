@@ -210,7 +210,12 @@ export default function decorate(block) {
 
   // 取得圖片並進行最佳化
   const img = imgCol?.querySelector('img');
-  const picture = img ? createOptimizedPicture(img.src, img.alt || 'Info card image') : null;
+  let picture = img ? createOptimizedPicture(img.src, img.alt || 'Info card image') : null;
+
+  // 魯棒性處理：如果找不到 img 標籤但有圖片連結文字，手動建立
+  if (!picture && imgCol?.textContent.trim().match(/\.(jpg|jpeg|png|gif|svg|webp)/i)) {
+    picture = createOptimizedPicture(imgCol.textContent.trim(), 'Info card image');
+  }
 
   // 清空原始表格並重建 DOM
   block.textContent = '';
