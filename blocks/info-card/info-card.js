@@ -3,7 +3,7 @@ import { createOptimizedPicture } from '../../scripts/aem.js';
 export default function decorate(block) {
   // 將每一列的第一個 Cell 轉為一個屬性陣列
   const props = [...block.children].map((row) => row.firstElementChild);
-  const [imgCol, titleCol, descCol, btnTextCol, btnLinkCol] = props;
+  const [imgCol, cardtitleCol, descCol, btnTextCol, btnLinkCol] = props;
 
   // 取得圖片並進行最佳化 (更加魯棒的提取方式)
   const img = imgCol?.querySelector('img');
@@ -15,7 +15,7 @@ export default function decorate(block) {
   }
 
   // 取得文字內容
-  const title = titleCol?.textContent || '';
+  const cardtitle = cardtitleCol?.textContent || '';
   const desc = descCol?.innerHTML || '';
   const btnText = btnTextCol?.textContent || '';
   const btnLink = btnLinkCol?.textContent || '';
@@ -25,7 +25,7 @@ export default function decorate(block) {
   block.innerHTML = `
     <div class="info-card-image">${picture ? picture.outerHTML : ''}</div>
     <div class="info-card-content">
-      <h2>${title}</h2>
+      <h2>${cardtitle}</h2>
       <div class="desc">${desc}</div>
       <a href="${btnLink}" class="button primary">${btnText}</a>
     </div>

@@ -5358,9 +5358,9 @@
       },
       {
         "component": "text-input",
-        "name": "title",
+        "name": "cardtitle",
         "value": "",
-        "label": "Title",
+        "label": "Card Title",
         "valueType": "string"
       },
       {
