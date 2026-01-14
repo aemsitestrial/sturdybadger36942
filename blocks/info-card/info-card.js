@@ -1,5 +1,4 @@
 import { createOptimizedPicture } from '../../scripts/aem.js';
-import { moveInstrumentation } from '../../scripts/scripts.js';
 
 export default function decorate(block) {
   // 將每一列的第一個 Cell 轉為一個屬性陣列
@@ -15,7 +14,6 @@ export default function decorate(block) {
     picture = createOptimizedPicture(imgCol.textContent.trim(), 'Info card image');
   }
 
-
   // 取得文字內容
   const title = titleCol?.textContent || '';
   const desc = descCol?.innerHTML || '';
@@ -25,9 +23,9 @@ export default function decorate(block) {
   // 清空原始表格並重建 DOM
   block.textContent = '';
   block.innerHTML = `
-    <div class="info-card-image 2">${picture?.outerHTML}</div>
+    <div class="info-card-image">${picture ? picture.outerHTML : ''}</div>
     <div class="info-card-content">
-      <h2 class="title">${title}</h2>
+      <h2>${title}</h2>
       <div class="desc">${desc}</div>
       <a href="${btnLink}" class="button primary">${btnText}</a>
     </div>
