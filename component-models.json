@@ -5351,28 +5351,38 @@
     "fields": [
       {
         "component": "reference",
-        "name": "image",
-        "label": "影像"
+        "valueType": "string",
+        "name": "fileReference",
+        "label": "Background Image",
+        "multi": false
       },
       {
-        "component": "text",
+        "component": "text-input",
         "name": "title",
-        "label": "標題"
+        "value": "",
+        "label": "Title",
+        "valueType": "string"
       },
       {
-        "component": "richtext",
-        "name": "description",
-        "label": "描述文字"
+        "component": "text-input",
+        "name": "desc",
+        "value": "",
+        "label": "Description",
+        "valueType": "string"
       },
       {
-        "component": "text",
-        "name": "btnText",
-        "label": "按鈕文字"
+        "component": "text-input",
+        "name": "link-url",
+        "value": "",
+        "label": "Link URL",
+        "valueType": "string"
       },
       {
-        "component": "aem-content",
-        "name": "btnLink",
-        "label": "按鈕連結"
+        "component": "text-input",
+        "name": "link-text",
+        "value": "",
+        "label": "Link Text",
+        "valueType": "string"
       }
     ]
   },

@@ -1,22 +1,24 @@
-import { createOptimizedPicture } from '../../scripts/aem.js';
 
 export default function decorate(block) {
-  // 按照 JSON 定義的順序提取欄位
-  const props = [...block.children].map((row) => row.firstElementChild);
-  const [imgCol, titleCol, descCol, btnTextCol, btnLinkCol] = props;
+  const textTitle = block.querySelector('p').textContent;
+  const textDesc = block.querySelector('p')[1].textContent;
+  const linkUrl = block.querySelector('p')[2].textContent;
+  const textLink = block.querySelector('p')[3].textContent;
 
-  // 取得圖片並進行最佳化
-  const img = imgCol.querySelector('img');
-  const picture = img ? createOptimizedPicture(img.src, img.alt || 'Info card image') : '';
 
-  // 構造全新的語義化 DOM
   block.textContent = '';
-  block.innerHTML = `
-    <div class="info-card-image">${picture.outerHTML}</div>
-    <div class="info-card-content">
-      <h2>${titleCol.textContent}</h2>
-      <div class="desc">${descCol.innerHTML}</div>
-      <a href="${btnLinkCol.textContent}" class="button primary">${btnTextCol.textContent}</a>
-    </div>
-  `;
+ 
+
+  const locatorDOM = document.createRange().createContextualFragment(`
+
+  <div class="info-card-content">
+    <h2>${textTitle}</h2>
+    <div class="desc">${textDesc}</div>
+    <a href="${linkUrl}" class="button primary">${textLink}</a>
+  </div>
+  `);
+
+  block.append(locatorDOM);
 }
+
+
