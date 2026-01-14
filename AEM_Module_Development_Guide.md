@@ -187,11 +187,15 @@ export default function decorate(block) {
 }
 ```
 
-### 步驟 3：註冊模組
-開啟 `models/_component-definition.json`，在 `blocks` 群組中加入：
+### 步驟 3：註冊模組與權限
+1. 開啟 `models/_component-definition.json`，在 `blocks` 群組中加入定義引用：
 ```json
 { "...": "../blocks/info-card/_*.json#/definitions" }
 ```
+
+2. 開啟 `models/_section.json`，在 `id: "section"` 的 `components` 列表中加入 `"info-card"`。
+
+3. (選填) 開啟 `models/_common-blocks.json` 並加入 `"info-card"`。
 
 ### 步驟 4：實作裝飾器邏輯 (`info-card.js`)
 JS 將處理 AEM 輸出的原始表格，並使用 `createOptimizedPicture` 進行最佳化。

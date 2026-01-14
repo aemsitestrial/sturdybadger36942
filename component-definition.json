@@ -714,15 +714,15 @@
           }
         },
         {
-          "title": "Info Card",
+          "title": "info-card",
           "id": "info-card",
           "plugins": {
             "xwalk": {
               "page": {
                 "resourceType": "core/franklin/components/block/v1/block",
                 "template": {
-                  "name": "Info Card",
-                  "model": "info-card-model"
+                  "name": "info-card",
+                  "model": "info-card"
                 }
               }
             }

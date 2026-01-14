@@ -30,7 +30,8 @@
       "embed-adaptive-form",
       "reward",
       "reward-sticky",
-      "quiz"
+      "quiz",
+      "info-card"
     ]
   },
   {
@@ -44,6 +45,7 @@
       "cards",
       "columns",
       "fragment",
+      "info-card",
       "commerce-wishlist"
     ]
   },
