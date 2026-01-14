@@ -1,0 +1,32 @@
+{
+  "definitions": [
+    {
+      "title": "Info Card",
+      "id": "info-card",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/block/v1/block",
+            "template": {
+              "name": "Info Card",
+              "model": "info-card-model"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "info-card-model",
+      "fields": [
+        { "component": "reference", "name": "image", "label": "影像" },
+        { "component": "text", "name": "title", "label": "標題" },
+        { "component": "richtext", "name": "description", "label": "描述文字" },
+        { "component": "text", "name": "btnText", "label": "按鈕文字" },
+        { "component": "aem-content", "name": "btnLink", "label": "按鈕連結" }
+      ]
+    }
+  ],
+  "filters": []
+}
