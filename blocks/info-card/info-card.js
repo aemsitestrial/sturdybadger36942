@@ -2,7 +2,8 @@ import { createOptimizedPicture } from '../../scripts/aem.js';
 
 export default function decorate(block) {
   // 按照 JSON 定義的順序提取欄位
-  const [imgCol, titleCol, descCol, btnTextCol, btnLinkCol] = [...block.children].map(row => row.firstElementChild);
+  const props = [...block.children].map((row) => row.firstElementChild);
+  const [imgCol, titleCol, descCol, btnTextCol, btnLinkCol] = props;
 
   // 取得圖片並進行最佳化
   const img = imgCol.querySelector('img');

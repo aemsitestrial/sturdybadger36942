@@ -57,6 +57,9 @@
         },
         {
           "...": "../blocks/form/_*.json#/definitions"
+        },
+        {
+          "...": "../blocks/info-card/_*.json#/definitions"
         }
       ]
     },

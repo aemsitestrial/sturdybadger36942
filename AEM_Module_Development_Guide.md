@@ -112,7 +112,26 @@ export default function decorate(block) {
 
 ---
 
-## 4. 限制與陷阱
+## 4. 檔案彙整機制 (Aggregation Mechanism)
+
+本專案使用 `merge-json-cli` 進行模型彙整。理解哪些檔案是「源頭」，哪些是「產出」至關重要。
+
+### 4.1 原始定義 (Source Files) - **請修改這些檔案**
+*   `/models/_*.json`: 全域的模型、定義與過濾器模板。
+*   `/blocks/*/_*.json`: 各別模組的局部定義。
+
+### 4.2 自動產出 (Generated Files) - **請勿手動修改**
+以下檔案是由 `npm run build:json` 產生的，手動修改這些檔案會在下次建構時被覆蓋：
+*   `/component-definition.json`
+*   `/component-models.json`
+*   `/component-filters.json`
+
+> [!TIP]
+> **開發規範**：永遠修改 `models/` 或 `blocks/` 下的底線開頭檔案，然後執行 `npm run build:json` 來同步變更。
+
+---
+
+## 5. 限制與陷阱
 
 1.  **Dialog 限制**: Universal Editor JSON 不支援執行複雜的 JS。所有的邏輯應盡量在前端 JS 處理。
 2.  **樣式隔離**: AEM 會自動為 Block 加上類名（如 `.hero-wrapper`）。請務必在 CSS 中使用 `.hero { ... }` 進行隔離，避免全局汙染。
@@ -168,7 +187,13 @@ export default function decorate(block) {
 }
 ```
 
-### 步驟 3：實作裝飾器邏輯 (`info-card.js`)
+### 步驟 3：註冊模組
+開啟 `models/_component-definition.json`，在 `blocks` 群組中加入：
+```json
+{ "...": "../blocks/info-card/_*.json#/definitions" }
+```
+
+### 步驟 4：實作裝飾器邏輯 (`info-card.js`)
 JS 將處理 AEM 輸出的原始表格，並使用 `createOptimizedPicture` 進行最佳化。
 
 ```javascript
@@ -176,7 +201,8 @@ import { createOptimizedPicture } from '../../scripts/aem.js';
 
 export default function decorate(block) {
   // 按照 JSON 定義的順序提取欄位
-  const [imgCol, titleCol, descCol, btnTextCol, btnLinkCol] = [...block.children].map(row => row.firstElementChild);
+  const props = [...block.children].map((row) => row.firstElementChild);
+  const [imgCol, titleCol, descCol, btnTextCol, btnLinkCol] = props;
 
   // 取得圖片並進行最佳化
   const img = imgCol.querySelector('img');
@@ -195,7 +221,7 @@ export default function decorate(block) {
 }
 ```
 
-### 步驟 4：定義視覺樣式 (`info-card.css`)
+### 步驟 5：定義視覺樣式 (`info-card.css`)
 使用樣式名稱空間隔離，確保不會影響頁面其他部分。
 
 ```css
@@ -222,6 +248,17 @@ export default function decorate(block) {
   text-decoration: none;
 }
 ```
+
+### 步驟 6：執行建構與測試
+執行以下指令產生 AEM 設定檔：
+```bash
+npm run build:json
+```
+
+> [!NOTE]
+> **連動說明**：執行此指令後，系統會自動根據你剛才在 `models/` 與 `blocks/` 中的修改，重新產出根目錄下的 `component-definition.json`。你不需要（也不應該）手動修改根目錄下的該檔案。
+
+現在你可以在 AEM Universal Editor 的組件面板中看到 **Info Card** 了！
 
 ---
 
