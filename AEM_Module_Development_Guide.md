@@ -204,22 +204,24 @@ JS 將處理 AEM 輸出的原始表格，並使用 `createOptimizedPicture` 進�
 import { createOptimizedPicture } from '../../scripts/aem.js';
 
 export default function decorate(block) {
-  // 按照 JSON 定義的順序提取欄位
+  // 將每一列的第一個 Cell 轉為一個屬性陣列
   const props = [...block.children].map((row) => row.firstElementChild);
   const [imgCol, titleCol, descCol, btnTextCol, btnLinkCol] = props;
 
   // 取得圖片並進行最佳化
-  const img = imgCol.querySelector('img');
-  const picture = img ? createOptimizedPicture(img.src, img.alt || 'Info card image') : '';
+  const img = imgCol?.querySelector('img');
+  const picture = img ? createOptimizedPicture(img.src, img.alt || 'Info card image') : null;
 
-  // 構造全新的語義化 DOM
+  // 清空原始表格並重建 DOM
   block.textContent = '';
   block.innerHTML = `
-    <div class="info-card-image">${picture.outerHTML}</div>
+    <div class="info-card-image">${picture ? picture.outerHTML : ''}</div>
     <div class="info-card-content">
-      <h2>${titleCol.textContent}</h2>
-      <div class="desc">${descCol.innerHTML}</div>
-      <a href="${btnLinkCol.textContent}" class="button primary">${btnTextCol.textContent}</a>
+      <h2>${titleCol?.textContent || ''}</h2>
+      <div class="desc">${descCol?.innerHTML || ''}</div>
+      <a href="${btnLinkCol?.textContent || ''}" class="button primary">
+        ${btnTextCol?.textContent || ''}
+      </a>
     </div>
   `;
 }
