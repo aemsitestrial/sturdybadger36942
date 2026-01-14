@@ -18,7 +18,7 @@
   ],
   "models": [
     {
-      "id": "info-card-model",
+      "id": "info-card",
       "fields": [
         { "component": "reference", "name": "image", "label": "影像" },
         { "component": "text", "name": "title", "label": "標題" },
