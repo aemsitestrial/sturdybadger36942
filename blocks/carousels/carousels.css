@@ -65,3 +65,10 @@
   color: #fff;
   text-shadow: 0 0 3px rgb(0 0 0 / 50%);
 }
+
+.carousels.swiper .swiper-slide {
+  width: 552px;
+  min-height: unset;
+  border: 1px solid red;
+  box-sizing: border-box;
+}

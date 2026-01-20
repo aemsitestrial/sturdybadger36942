@@ -21,10 +21,30 @@ export default async function decorate(block) {
     // 處理圖片 (對應 JSON model: carouselItem > fields > image)
     const picCol = row.firstElementChild; 
     if (picCol) {
+        let imgSrc = null;
+        let imgAlt = '';
+        
+        // 優先檢查是否有 img 標籤
         const img = picCol.querySelector('img');
         if (img) {
+            imgSrc = img.src;
+            imgAlt = img.alt || '';
+        } else {
+            // 如果沒有 img，檢查是否有 <a> 連結（reference 未正確渲染時的 fallback）
+            const anchor = picCol.querySelector('a');
+            if (anchor && anchor.href) {
+                // 檢查連結是否指向圖片
+                const href = anchor.href;
+                if (href.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i) || href.includes('/assets/')) {
+                    imgSrc = href;
+                    imgAlt = anchor.title || anchor.textContent || '';
+                }
+            }
+        }
+        
+        if (imgSrc) {
             // EDS 圖片優化標準寫法
-            const newPic = createOptimizedPicture(img.src, img.alt, false, [{ width: '750' }]);
+            const newPic = createOptimizedPicture(imgSrc, imgAlt, false, [{ width: '750' }]);
             picCol.replaceWith(newPic);
         }
     }
@@ -69,21 +89,16 @@ export default async function decorate(block) {
 
     // 初始化 Swiper
     new Swiper(block, {
-      slidesPerView: 1,
-      spaceBetween: 0, // 圖片輪播通常間距為 0
-      loop: true,      // 預覽模式可以安心開啟 Loop
+      loop: true,
+      slidesPerView: 'auto',
+      spaceBetween: 20,
+      centeredSlides: false,
       navigation: {
         nextEl: nextBtn,
         prevEl: prevBtn,
       },
-      pagination: {
-        el: pagination,
-        clickable: true,
-      },
-      autoplay: {
-        delay: 5000,
-        disableOnInteraction: false,
-      },
+      pagination: false,
+      autoplay: false
     });
   }
 }
