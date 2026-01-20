@@ -117,8 +117,9 @@ export default async function decorate(block) {
         const index = parseInt(thumb.dataset.index, 10);
         const selectedImage = images[index];
 
-        // 更新主圖
-        mainImageContainer.innerHTML = generatePictureHTML(selectedImage.src, selectedImage.alt, true);
+        // 更新主圖（src 和 alt 同時更新）
+        const newImageHTML = generatePictureHTML(selectedImage.src, selectedImage.alt, true);
+        mainImageContainer.innerHTML = newImageHTML;
 
         // 更新 active 狀態
         thumbs.forEach((t) => t.classList.remove('active'));
