@@ -1,104 +1,129 @@
 import { createOptimizedPicture } from '../../scripts/aem.js';
 
+/**
+ * 生成圖片 HTML
+ * @param {string} src - 圖片來源 URL
+ * @param {string} alt - 替代文字
+ * @param {boolean} eager - 是否立即載入
+ * @returns {string} picture HTML 字串
+ */
+function generatePictureHTML(src, alt = '', eager = false) {
+  // 判斷是否為外部 delivery URL
+  const isExternalUrl = src.includes('delivery-') && src.includes('.adobeaemcloud.com');
+
+  if (isExternalUrl) {
+    const loading = eager ? 'eager' : 'lazy';
+    return `<picture><img src="${src}" alt="${alt}" loading="${loading}"></picture>`;
+  }
+  // 本地圖片：使用 EDS 圖片優化
+  const picture = createOptimizedPicture(src, alt, eager, [{ width: '750' }]);
+  return picture.outerHTML;
+}
+
+/**
+ * 從 row 中提取圖片資訊
+ * @param {Element} row - carousel item row
+ * @returns {{ src: string|null, alt: string }}
+ */
+function extractImageInfo(row) {
+  const columns = [...row.children];
+  const picCol = columns[0]; // 第一欄：圖片
+  const altCol = columns[1]; // 第二欄：alt text
+
+  if (!picCol) return { src: null, alt: '' };
+
+  let src = null;
+
+  // 優先檢查是否有 img 標籤
+  const img = picCol.querySelector('img');
+  if (img) {
+    src = img.src;
+  } else {
+    // Fallback: 檢查是否有 <a> 連結
+    const anchor = picCol.querySelector('a');
+    if (anchor?.href) {
+      const { href } = anchor;
+      if (href.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i) || href.includes('/assets/')) {
+        src = href;
+      }
+    }
+  }
+
+  // 讀取 alt text（從第二欄）
+  const alt = altCol?.textContent?.trim() || '';
+
+  return { src, alt };
+}
+
 export default async function decorate(block) {
-  // 1. 偵測 Universal Editor 編輯模式
-  // UE 通常會給 html tag 加上 adobe-ue-edit class
+  // 偵測 Universal Editor 編輯模式
   const isEditMode = document.documentElement.classList.contains('adobe-ue-edit');
 
-  // 2. 準備容器
-  // 如果是編輯模式，我們用一個 grid container；如果是預覽，這是 swiper-wrapper
-  const wrapper = document.createElement('div');
-  wrapper.className = isEditMode ? 'carousels-editor-grid' : 'swiper-wrapper';
+  // 收集所有圖片資訊
+  const images = [...block.children].map((row) => {
+    const { src, alt } = extractImageInfo(row);
+    // 保留原始 row 的 data-aue-* 屬性（Universal Editor 用）
+    const dataAttrs = [...row.attributes]
+      .filter((attr) => attr.name.startsWith('data-aue'))
+      .map((attr) => `${attr.name}="${attr.value}"`)
+      .join(' ');
+    return { src, alt, dataAttrs };
+  }).filter((img) => img.src); // 只保留有圖片的項目
 
-  // 3. 處理 Block 的子項目 (Rows)
-  // block.children 對應到 JSON 中的 "definitions > carousels > components > carouselItem"
-  [...block.children].forEach((row) => {
-    // 這裡的 'row' 就是每一個 CarouselItem
-    
-    // 設定 class
-    row.className = isEditMode ? 'carousel-item' : 'swiper-slide';
+  if (images.length === 0) {
+    block.innerHTML = '<p>No images found</p>';
+    return;
+  }
 
-    // 處理圖片 (對應 JSON model: carouselItem > fields > image)
-    const picCol = row.firstElementChild; 
-    if (picCol) {
-        let imgSrc = null;
-        let imgAlt = '';
-        
-        // 優先檢查是否有 img 標籤
-        const img = picCol.querySelector('img');
-        if (img) {
-            imgSrc = img.src;
-            imgAlt = img.alt || '';
-        } else {
-            // 如果沒有 img，檢查是否有 <a> 連結（reference 未正確渲染時的 fallback）
-            const anchor = picCol.querySelector('a');
-            if (anchor && anchor.href) {
-                // 檢查連結是否指向圖片
-                const href = anchor.href;
-                if (href.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i) || href.includes('/assets/')) {
-                    imgSrc = href;
-                    imgAlt = anchor.title || anchor.textContent || '';
-                }
-            }
-        }
-        
-        if (imgSrc) {
-            // EDS 圖片優化標準寫法
-            const newPic = createOptimizedPicture(imgSrc, imgAlt, false, [{ width: '750' }]);
-            picCol.replaceWith(newPic);
-        }
-    }
-
-    // 關鍵：將處理好的 row 移動到 wrapper 中
-    // 我們直接移動 row 元素本身，這樣可以保留 Universal Editor 的 data-aue-* 屬性
-    wrapper.append(row);
-  });
-
-  // 4. 重組 Block DOM
-  block.textContent = ''; // 清空原始內容
-  block.append(wrapper);
-
-  // 5. 根據模式分岔處理
   if (isEditMode) {
     // === 編輯模式 ===
     block.classList.add('is-editor');
-    // 這裡不初始化 Swiper。
-    // 因為 Block 的 HTML 結構單純 (Grid)，UE 可以輕鬆地掛載選取框和「+」按鈕。
-    
+    const thumbnails = images.map((img, index) => `
+      <div class="carousel-item" ${img.dataAttrs} data-index="${index}">
+        ${generatePictureHTML(img.src, img.alt)}
+      </div>
+    `).join('');
+
+    block.innerHTML = `
+      <div class="carousels-editor-grid">${thumbnails}</div>
+    `;
   } else {
     // === 預覽 / Live 模式 ===
-    block.classList.add('swiper');
+    // 生成縮圖導航
+    const thumbnails = images.map((img, index) => `
+      <div class="carousel-thumb${index === 0 ? ' active' : ''}" data-index="${index}">
+        ${generatePictureHTML(img.src, img.alt)}
+      </div>
+    `).join('');
 
-    // 加入 Swiper 必備的 UI 元件
-    const nextBtn = document.createElement('div');
-    nextBtn.className = 'swiper-button-next';
-    const prevBtn = document.createElement('div');
-    prevBtn.className = 'swiper-button-prev';
-    const pagination = document.createElement('div');
-    pagination.className = 'swiper-pagination';
+    // 第一張圖作為預設主圖
+    const mainImageHTML = generatePictureHTML(images[0].src, images[0].alt, true);
 
-    block.append(nextBtn, prevBtn, pagination);
+    block.innerHTML = `
+      <div class="carousel-main-image">
+        ${mainImageHTML}
+      </div>
+      <div class="carousel-thumbnails">
+        ${thumbnails}
+      </div>
+    `;
 
-    // 動態載入 Swiper 資源 (Lazy Load 以提升 PageSpeed 分數)
-    const cssLink = document.createElement('link');
-    cssLink.rel = 'stylesheet';
-    cssLink.href = 'https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css';
-    document.head.appendChild(cssLink);
+    // 綁定點擊事件：點擊縮圖切換主圖
+    const mainImageContainer = block.querySelector('.carousel-main-image');
+    const thumbs = block.querySelectorAll('.carousel-thumb');
 
-    const { default: Swiper } = await import('https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.mjs');
+    thumbs.forEach((thumb) => {
+      thumb.addEventListener('click', () => {
+        const index = parseInt(thumb.dataset.index, 10);
+        const selectedImage = images[index];
 
-    // 初始化 Swiper
-    new Swiper(block, {
-      loop: true,
-      slidesPerView: 'auto',
-      spaceBetween: 20,
-      centeredSlides: false,
-      navigation: {
-        nextEl: nextBtn,
-        prevEl: prevBtn,
-      },
-      pagination: false,
-      autoplay: false
+        // 更新主圖
+        mainImageContainer.innerHTML = generatePictureHTML(selectedImage.src, selectedImage.alt, true);
+
+        // 更新 active 狀態
+        thumbs.forEach((t) => t.classList.remove('active'));
+        thumb.classList.add('active');
+      });
     });
   }
 }

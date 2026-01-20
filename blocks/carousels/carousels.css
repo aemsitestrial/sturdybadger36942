@@ -6,27 +6,21 @@
   width: 100%;
   height: auto;
   object-fit: cover;
-
-  /* 根據需求設定圖片高度，例如： */
-  aspect-ratio: 16 / 9; 
 }
 
 /* =========================================
    編輯模式 (Editor Mode)
    ========================================= */
 .carousels.is-editor {
-  /* 確保編輯器可以選取到這個區塊 */
   min-height: 100px;
 }
 
 .carousels.is-editor .carousels-editor-grid {
   display: grid;
-
-  /* 自動填滿 columns，最小寬度 200px (方便預覽小圖) */
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 16px;
   padding: 16px;
-  border: 2px dashed #ccc; /* 視覺提示：這裡是編輯區 */
+  border: 2px dashed #ccc;
 }
 
 .carousels.is-editor .carousel-item {
@@ -36,39 +30,71 @@
 }
 
 /* =========================================
-   預覽模式 (Swiper Mode)
+   預覽模式 - 主圖 + 縮圖導航
    ========================================= */
-.carousels.swiper {
-  position: relative;
+
+/* 主圖區域 */
+.carousels .carousel-main-image {
+  width: 100%;
+  margin-bottom: 16px;
+  border-radius: 8px;
   overflow: hidden;
 }
 
-/* CLS 優化：在 Swiper JS 載入前，確保版面不會亂跳 */
-.carousels:not(.is-editor, .swiper-initialized) .swiper-wrapper {
+.carousels .carousel-main-image img {
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+/* 縮圖導航區域 */
+.carousels .carousel-thumbnails {
   display: flex;
-  overflow: hidden;
+  gap: 12px;
+  overflow-x: auto;
+  padding: 8px 0;
+  scrollbar-width: thin;
 }
 
-.carousels:not(.is-editor, .swiper-initialized) .swiper-slide {
+/* 單一縮圖 */
+.carousels .carousel-thumb {
   flex-shrink: 0;
-  width: 100%; /* 預設先顯示滿版 */
+  width: 100px;
+  height: 100px;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid transparent;
+  opacity: 0.6;
+  transition: opacity 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
 
-  /* 除了第一張，其他先隱藏，避免瞬間閃爍 */
-  &:not(:first-child) {
-    display: none;
+.carousels .carousel-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  aspect-ratio: 1 / 1;
+}
+
+.carousels .carousel-thumb:hover {
+  opacity: 0.9;
+  transform: scale(1.05);
+}
+
+.carousels .carousel-thumb.active {
+  opacity: 1;
+  border-color: #0066cc;
+}
+
+/* =========================================
+   響應式設計
+   ========================================= */
+@media (max-width: 768px) {
+  .carousels .carousel-thumb {
+    width: 80px;
+    height: 80px;
   }
-}
 
-/* 調整 Navigation 按鈕顏色 (Swiper 預設是藍色) */
-.carousels .swiper-button-next,
-.carousels .swiper-button-prev {
-  color: #fff;
-  text-shadow: 0 0 3px rgb(0 0 0 / 50%);
-}
-
-.carousels.swiper .swiper-slide {
-  width: 552px;
-  min-height: unset;
-  border: 1px solid red;
-  box-sizing: border-box;
+  .carousels .carousel-thumbnails {
+    gap: 8px;
+  }
 }

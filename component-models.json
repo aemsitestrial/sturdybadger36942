@@ -220,6 +220,13 @@
         "label": "Image",
         "multi": false,
         "metaProperty": "og:image"
+      },
+      {
+        "component": "text-input",
+        "valueType": "string",
+        "name": "alt",
+        "label": "Alt Text",
+        "value": ""
       }
     ]
   },
