@@ -1,0 +1,67 @@
+/* =========================================
+   通用樣式 (圖片設定)
+   ========================================= */
+.carousels img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+
+  /* 根據需求設定圖片高度，例如： */
+  aspect-ratio: 16 / 9; 
+}
+
+/* =========================================
+   編輯模式 (Editor Mode)
+   ========================================= */
+.carousels.is-editor {
+  /* 確保編輯器可以選取到這個區塊 */
+  min-height: 100px;
+}
+
+.carousels.is-editor .carousels-editor-grid {
+  display: grid;
+
+  /* 自動填滿 columns，最小寬度 200px (方便預覽小圖) */
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+  padding: 16px;
+  border: 2px dashed #ccc; /* 視覺提示：這裡是編輯區 */
+}
+
+.carousels.is-editor .carousel-item {
+  border: 1px solid #e0e0e0;
+  position: relative;
+  background: #f9f9f9;
+}
+
+/* =========================================
+   預覽模式 (Swiper Mode)
+   ========================================= */
+.carousels.swiper {
+  position: relative;
+  overflow: hidden;
+}
+
+/* CLS 優化：在 Swiper JS 載入前，確保版面不會亂跳 */
+.carousels:not(.is-editor, .swiper-initialized) .swiper-wrapper {
+  display: flex;
+  overflow: hidden;
+}
+
+.carousels:not(.is-editor, .swiper-initialized) .swiper-slide {
+  flex-shrink: 0;
+  width: 100%; /* 預設先顯示滿版 */
+
+  /* 除了第一張，其他先隱藏，避免瞬間閃爍 */
+  &:not(:first-child) {
+    display: none;
+  }
+}
+
+/* 調整 Navigation 按鈕顏色 (Swiper 預設是藍色) */
+.carousels .swiper-button-next,
+.carousels .swiper-button-prev {
+  color: #fff;
+  text-shadow: 0 0 3px rgb(0 0 0 / 50%);
+}

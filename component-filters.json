@@ -31,7 +31,8 @@
       "reward",
       "reward-sticky",
       "quiz",
-      "info-card"
+      "info-card",
+      "carousels"
     ]
   },
   {
@@ -53,6 +54,12 @@
     "id": "cards",
     "components": [
       "card"
+    ]
+  },
+  {
+    "id": "carousels",
+    "components": [
+      "carouselItem"
     ]
   },
   {

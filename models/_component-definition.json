@@ -60,6 +60,9 @@
         },
         {
           "...": "../blocks/info-card/_*.json#/definitions"
+        },
+        {
+          "...": "../blocks/carousels/_*.json#/definitions"
         }
       ]
     },
