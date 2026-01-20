@@ -27,6 +27,7 @@
   border: 1px solid #e0e0e0;
   position: relative;
   background: #f9f9f9;
+  min-height: 100px; /* Ensure empty items are visible */
 }
 
 /* =========================================

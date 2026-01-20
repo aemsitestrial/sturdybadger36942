@@ -60,7 +60,8 @@ export default async function decorate(block) {
   const isEditMode = document.documentElement.classList.contains('adobe-ue-edit');
 
   // 收集所有圖片資訊
-  const images = [...block.children].map((row) => {
+  // 收集所有圖片資訊
+  const slidesData = [...block.children].map((row) => {
     const { src, alt } = extractImageInfo(row);
     // 保留原始 row 的 data-aue-* 屬性（Universal Editor 用）
     const dataAttrs = [...row.attributes]
@@ -68,10 +69,13 @@ export default async function decorate(block) {
       .map((attr) => `${attr.name}="${attr.value}"`)
       .join(' ');
     return { src, alt, dataAttrs };
-  }).filter((img) => img.src); // 只保留有圖片的項目
+  });
 
-  if (images.length === 0) {
-    block.innerHTML = '<p>No images found</p>';
+  // 在編輯模式下保留所有項目（包含新建立的空項目），預覽模式下只顯示有圖片的項目
+  const images = isEditMode ? slidesData : slidesData.filter((img) => img.src);
+
+  if (!isEditMode && images.length === 0) {
+    block.innerHTML = '';
     return;
   }
 
