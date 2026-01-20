@@ -59,9 +59,31 @@ export default async function decorate(block) {
   // 偵測 Universal Editor 編輯模式
   const isEditMode = document.documentElement.classList.contains('adobe-ue-edit');
 
+  // 區分 Config Rows 和 Slide Rows
+  const rows = [...block.children];
+  const config = {
+    arrowLeftAltText: 'Previous slide',
+    arrowRightAltText: 'Next slide',
+  };
+  const slideRows = [];
+
+  rows.forEach((row) => {
+    const firstCol = row.children[0];
+    const hasImage = firstCol.querySelector('img') || (firstCol.querySelector('a')?.href.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i));
+    
+    // 如果第一欄沒有圖片且有文字，視為 Config Row
+    if (!hasImage && firstCol.textContent.trim()) {
+      const key = firstCol.textContent.trim();
+      const value = row.children[1]?.textContent.trim();
+      if (key === 'Arrow Left Alt Text') config.arrowLeftAltText = value;
+      if (key === 'Arrow Right Alt Text') config.arrowRightAltText = value;
+    } else {
+      slideRows.push(row);
+    }
+  });
+
   // 收集所有圖片資訊
-  // 收集所有圖片資訊
-  const slidesData = [...block.children].map((row) => {
+  const slidesData = slideRows.map((row) => {
     const { src, alt } = extractImageInfo(row);
     // 保留原始 row 的 data-aue-* 屬性（Universal Editor 用）
     const dataAttrs = [...row.attributes]
@@ -95,7 +117,11 @@ export default async function decorate(block) {
     // === 預覽 / Live 模式 ===
     // 生成縮圖導航 (Swiper Structure)
     const thumbnails = images.map((img, index) => `
-      <div class="swiper-slide carousel-thumb${index === 0 ? ' active' : ''}" data-index="${index}">
+      <div class="swiper-slide carousel-thumb${index === 0 ? ' active' : ''}" 
+        data-index="${index}"
+        tabindex="0"
+        role="button"
+        aria-label="Go to slide ${index + 1} - ${img.alt || `Image  + ${(index + 1)}`}">
         ${generatePictureHTML(img.src, img.alt)}
       </div>
     `).join('');
@@ -114,17 +140,19 @@ export default async function decorate(block) {
           ${thumbnails}
         </div>
         <!-- Navigation Buttons -->
-        <div class="swiper-button-next"></div>
-        <div class="swiper-button-prev"></div>
+        <div class="swiper-button-prev" role="button" tabindex="0" aria-label="${config.arrowLeftAltText}"></div>
+        <div class="swiper-button-next" role="button" tabindex="0" aria-label="${config.arrowRightAltText}"></div>
       </div>
     `;
 
+    // 動態載入 Swiper 資源
     // 動態載入 Swiper 資源
     const cssLink = document.createElement('link');
     cssLink.rel = 'stylesheet';
     cssLink.href = 'https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css';
     document.head.appendChild(cssLink);
 
+    // eslint-disable-next-line import/no-unresolved, import/extensions
     const { default: Swiper } = await import('https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.mjs');
 
     // 初始化 Thumbnails Swiper
@@ -137,29 +165,49 @@ export default async function decorate(block) {
         nextEl: '.carousel-thumbnails .swiper-button-next',
         prevEl: '.carousel-thumbnails .swiper-button-prev',
       },
-      freeMode: true, // 允許自由滑動
+      freeMode: false, // 改為 false，讓它每次只能滑動一格，配合 navigation
       watchSlidesProgress: true,
     });
 
-    // 綁定點擊事件：點擊縮圖切換主圖
-    const mainImageContainer = block.querySelector('.carousel-main-image');
-    const thumbs = block.querySelectorAll('.carousel-thumb');
+    // 抽出更新主圖的邏輯
+    const updateMainImage = (index) => {
+      if (!images[index]) return;
 
+      const selectedImage = images[index];
+      const mainImageContainer = block.querySelector('.carousel-main-image');
+      const thumbs = block.querySelectorAll('.carousel-thumb');
+
+      // 更新主圖
+      const imageHTML = generatePictureHTML(selectedImage.src, selectedImage.alt, true);
+      mainImageContainer.innerHTML = imageHTML;
+
+      // 更新 active 狀態
+      thumbs.forEach((t) => t.classList.remove('active'));
+      const activeThumb = block.querySelector(`.carousel-thumb[data-index="${index}"]`);
+      if (activeThumb) activeThumb.classList.add('active');
+    };
+
+    // 綁定 slideChange 事件，確保點擊箭頭或滑動都能觸發主圖更新
+    thumbsSwiper.on('slideChange', () => {
+      updateMainImage(thumbsSwiper.activeIndex);
+    });
+
+    // 綁定點擊與鍵盤事件
+    const thumbs = block.querySelectorAll('.carousel-thumb');
     thumbs.forEach((thumb) => {
+      // 點擊事件
       thumb.addEventListener('click', () => {
         const index = parseInt(thumb.dataset.index, 10);
-        const selectedImage = images[index];
-
-        // 更新主圖（src 和 alt 同時更新）
-        const newImageHTML = generatePictureHTML(selectedImage.src, selectedImage.alt, true);
-        mainImageContainer.innerHTML = newImageHTML;
-
-        // 更新 active 狀態
-        thumbs.forEach((t) => t.classList.remove('active'));
-        thumb.classList.add('active');
-
-        // 讓 Swiper 滑動到該項目並置中
+        // 只要讓 Swiper 滑過去，就會觸發 slideChange 事件，進而執行 updateMainImage
         thumbsSwiper.slideTo(index);
+      });
+
+      // 鍵盤事件 (Enter / Space)
+      thumb.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault(); // 防止 Space 捲動頁面
+          thumb.click();
+        }
       });
     });
   }

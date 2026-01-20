@@ -9,7 +9,8 @@
             "resourceType": "core/franklin/components/block/v1/block",
             "template": {
               "name": "Carousels",
-              "filter": "carousels"
+              "filter": "carousels",
+              "model": "carousels"
             }
           }
         }
@@ -32,6 +33,25 @@
     }
   ],
   "models": [
+    {
+      "id": "carousels",
+      "fields": [
+        {
+          "component": "text-input",
+          "valueType": "string",
+          "name": "arrowLeftAltText",
+          "label": "Arrow Left Alt Text",
+          "value": "Previous slide"
+        },
+        {
+          "component": "text-input",
+          "valueType": "string",
+          "name": "arrowRightAltText",
+          "label": "Arrow Right Alt Text",
+          "value": "Next slide"
+        }
+      ]
+    },
     {
       "id": "carouselItem",
       "fields": [
