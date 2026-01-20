@@ -70,7 +70,6 @@ export default async function decorate(block) {
   rows.forEach((row) => {
     const firstCol = row.children[0];
     const hasImage = firstCol.querySelector('img') || (firstCol.querySelector('a')?.href.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i));
-    
     // 如果第一欄沒有圖片且有文字，視為 Config Row
     if (!hasImage && firstCol.textContent.trim()) {
       const key = firstCol.textContent.trim();
