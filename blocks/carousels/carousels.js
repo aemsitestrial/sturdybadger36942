@@ -93,9 +93,9 @@ export default async function decorate(block) {
     `;
   } else {
     // === 預覽 / Live 模式 ===
-    // 生成縮圖導航
+    // 生成縮圖導航 (Swiper Structure)
     const thumbnails = images.map((img, index) => `
-      <div class="carousel-thumb${index === 0 ? ' active' : ''}" data-index="${index}">
+      <div class="swiper-slide carousel-thumb${index === 0 ? ' active' : ''}" data-index="${index}">
         ${generatePictureHTML(img.src, img.alt)}
       </div>
     `).join('');
@@ -107,10 +107,39 @@ export default async function decorate(block) {
       <div class="carousel-main-image">
         ${mainImageHTML}
       </div>
-      <div class="carousel-thumbnails">
-        ${thumbnails}
+      
+      <!-- Thumbnails Swiper -->
+      <div class="carousel-thumbnails swiper">
+        <div class="swiper-wrapper">
+          ${thumbnails}
+        </div>
+        <!-- Navigation Buttons -->
+        <div class="swiper-button-next"></div>
+        <div class="swiper-button-prev"></div>
       </div>
     `;
+
+    // 動態載入 Swiper 資源
+    const cssLink = document.createElement('link');
+    cssLink.rel = 'stylesheet';
+    cssLink.href = 'https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css';
+    document.head.appendChild(cssLink);
+
+    const { default: Swiper } = await import('https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.mjs');
+
+    // 初始化 Thumbnails Swiper
+    const thumbsSwiper = new Swiper(block.querySelector('.carousel-thumbnails'), {
+      loop: false, // 縮圖列表通常不開啟 loop
+      slidesPerView: 'auto',
+      spaceBetween: 10,
+      centeredSlides: true, // 設定置中
+      navigation: {
+        nextEl: '.carousel-thumbnails .swiper-button-next',
+        prevEl: '.carousel-thumbnails .swiper-button-prev',
+      },
+      freeMode: true, // 允許自由滑動
+      watchSlidesProgress: true,
+    });
 
     // 綁定點擊事件：點擊縮圖切換主圖
     const mainImageContainer = block.querySelector('.carousel-main-image');
@@ -128,6 +157,9 @@ export default async function decorate(block) {
         // 更新 active 狀態
         thumbs.forEach((t) => t.classList.remove('active'));
         thumb.classList.add('active');
+
+        // 讓 Swiper 滑動到該項目並置中
+        thumbsSwiper.slideTo(index);
       });
     });
   }
