@@ -144,38 +144,53 @@ export default async function decorate(block) {
     return;
   }
 
-  // === 預覽 / Live 模式 ===
-  // 生成縮圖導航 (Swiper Structure)
-  const thumbnails = images.map((img, index) => `
-    <div class="swiper-slide carousel-thumb${index === 0 ? ' active' : ''}" 
-      data-index="${index}"
-      tabindex="0"
-      role="button"
-      aria-label="Go to slide ${index + 1} - ${img.alt || `Image  + ${(index + 1)}`}">
-      ${generatePictureHTML(img.src, img.alt)}
-    </div>
-  `).join('');
-
-  // 第一張圖作為預設主圖
-  const mainImageHTML = generatePictureHTML(images[0].src, images[0].alt, true);
-
-  block.innerHTML = `
-    <div class="carousel-main-image">
-      ${mainImageHTML}
-    </div>
-    
-    <!-- Thumbnails Swiper -->
-    <div class="carousel-thumbnails swiper">
-      <div class="swiper-wrapper">
-        ${thumbnails}
+  if (isEditMode) {
+    // === 編輯模式 ===
+    block.classList.add('is-editor');
+    const thumbnails = images.map((img, index) => `
+      <div class="carousel-item" ${img.dataAttrs} data-index="${index}">
+        ${generatePictureHTML(img.src, img.alt)}
       </div>
-      <!-- Navigation Buttons -->
-      <div class="swiper-button-prev" role="button" tabindex="0" aria-label="Arrow Left"></div>
-      <div class="swiper-button-next" role="button" tabindex="0" aria-label="Arrow Right"></div>
-    </div>
-  `;
+    `).join('');
 
-  // eslint-disable-next-line import/no-unresolved, import/extensions
-  const { default: Swiper } = await import('https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.mjs');
-  createCarousel(Swiper, block, images);
+    block.innerHTML = `
+      <div class="carousels-editor-grid">${thumbnails}</div>
+    `;
+  } else {
+    // === 預覽 / Live 模式 ===
+
+    // 生成縮圖導航 (Swiper Structure)
+    const thumbnails = images.map((img, index) => `
+      <div class="swiper-slide carousel-thumb${index === 0 ? ' active' : ''}" 
+        data-index="${index}"
+        tabindex="0"
+        role="button"
+        aria-label="Go to slide ${index + 1} - ${img.alt || `Image  + ${(index + 1)}`}">
+        ${generatePictureHTML(img.src, img.alt)}
+      </div>
+    `).join('');
+
+    // 第一張圖作為預設主圖
+    const mainImageHTML = generatePictureHTML(images[0].src, images[0].alt, true);
+
+    block.innerHTML = `
+      <div class="carousel-main-image">
+        ${mainImageHTML}
+      </div>
+      
+      <!-- Thumbnails Swiper -->
+      <div class="carousel-thumbnails swiper">
+        <div class="swiper-wrapper">
+          ${thumbnails}
+        </div>
+        <!-- Navigation Buttons -->
+        <div class="swiper-button-prev" role="button" tabindex="0" aria-label="Arrow Left"></div>
+        <div class="swiper-button-next" role="button" tabindex="0" aria-label="Arrow Right"></div>
+      </div>
+    `;
+
+    // eslint-disable-next-line import/no-unresolved, import/extensions
+    const { default: Swiper } = await import('https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.mjs');
+    createCarousel(Swiper, block, images);
+  }
 }
