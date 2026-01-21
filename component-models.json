@@ -215,17 +215,17 @@
     "fields": [
       {
         "component": "text-input",
-        "valueType": "string",
         "name": "arrowLeftAltText",
+        "value": "",
         "label": "Arrow Left Alt Text",
-        "value": "Previous slide"
+        "valueType": "string"
       },
       {
         "component": "text-input",
-        "valueType": "string",
         "name": "arrowRightAltText",
+        "value": "",
         "label": "Arrow Right Alt Text",
-        "value": "Next slide"
+        "valueType": "string"
       }
     ]
   },
