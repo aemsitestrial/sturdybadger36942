@@ -72,13 +72,10 @@ export default async function decorate(block) {
     const firstCol = row.children[0];
     const hasImage = firstCol.querySelector('img') || (firstCol.querySelector('a')?.href.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i));
     // 如果第一欄沒有圖片且有文字，視為 Config Row
-    console.log('firstCol textContent:', firstCol.textContent);
-    console.log('row:', row);
 
     if (!hasImage && firstCol.textContent.trim()) {
       const key = firstCol.textContent.trim();
       const value = row.children[1]?.textContent.trim();
-
 
       if (key === 'Arrow Left Alt Text') config.arrowLeftAltText = value;
       if (key === 'Arrow Right Alt Text') config.arrowRightAltText = value;

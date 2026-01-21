@@ -56,7 +56,7 @@ function extractImageInfo(row) {
   return { src, alt };
 }
 
-function createCarousel (Swiper, block, images) {
+function createCarousel(Swiper, block, images) {
   // 動態載入 Swiper 資源
   const cssLink = document.createElement('link');
   cssLink.rel = 'stylesheet';
