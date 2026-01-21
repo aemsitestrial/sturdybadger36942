@@ -211,6 +211,25 @@
     ]
   },
   {
+    "id": "cards",
+    "fields": [
+      {
+        "component": "text-input",
+        "name": "arrowLeftAltText",
+        "value": "",
+        "label": "Arrow Left Alt Text",
+        "valueType": "string"
+      },
+      {
+        "component": "text-input",
+        "name": "arrowRightAltText",
+        "value": "",
+        "label": "Arrow Right Alt Text",
+        "valueType": "string"
+      }
+    ]
+  },
+  {
     "id": "carousels",
     "fields": [
       {

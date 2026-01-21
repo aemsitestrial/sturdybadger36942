@@ -145,7 +145,6 @@ export default async function decorate(block) {
     `;
 
     // 動態載入 Swiper 資源
-    // 動態載入 Swiper 資源
     const cssLink = document.createElement('link');
     cssLink.rel = 'stylesheet';
     cssLink.href = 'https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css';
